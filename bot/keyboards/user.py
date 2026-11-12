@@ -18,7 +18,7 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
     builder.row(InlineKeyboardButton(text="خرید سرویس", callback_data=UserCallback.buy_service))
     builder.row(
         InlineKeyboardButton(text="سفارش‌های من", callback_data=UserCallback.my_services),
-        InlineKeyboardButton(text="پشتیبانی", url="tg://resolve?domain=@Saeedrlh"),
+        InlineKeyboardButton(text="پشتیبانی", url="tg://resolve?domain=Saeedrlh"),
     )
     return builder.as_markup()
 
