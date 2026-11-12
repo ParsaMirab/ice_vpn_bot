@@ -30,16 +30,16 @@ from bot.states.user import UserOrderStates
 from bot.services.user_service import UserService
 
 router = Router(name="user_start")
-WELCOME_TEXT = """
-🌿 به Ice VPN خوش آمدید
+WELCOME_TEXT = """\
+❄️ به دنیای Ice VPN خوش آمدید!
 
-🚀 خرید و مدیریت سرویس‌های شما
-⚡ اتصال سریع و پایدار
-🔒 امنیت و حریم خصوصی بالا
+🧊 تجربه‌ای متفاوت از سرعت و پایداری
+⚡ اتصال سریع، بدون مرز و محدودیت
+🔐 امنیت بالا و حفظ حریم خصوصی
+🌐 دسترسی آزاد و پایدار به اینترنت
 
-از منوی زیر گزینه موردنظر خود را انتخاب کنید.
+💎 سرویس موردنظر خود را از منوی زیر انتخاب کنید و از یک اتصال خنک و بی‌دغدغه لذت ببرید!
 """
-
 
 @router.message(CommandStart())
 async def start_command(message: Message, state: FSMContext) -> None:
