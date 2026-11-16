@@ -20,6 +20,7 @@ def join_required_keyboard(channels: list[RequiredChannel]) -> InlineKeyboardMar
         InlineKeyboardButton(
             text="✅ عضو شدم",
             callback_data=JOIN_REQUIRED_CHECK_CALLBACK,
+            style="success",
         )
     )
     return builder.as_markup()

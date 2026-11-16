@@ -166,9 +166,8 @@ class OrderService:
             return list(result.scalars().all())
 
     @staticmethod
-    async def approve_order(order_id: int, sub_link: str, config_text: str) -> Order | None:
-        normalized_sub_link = OrderService.normalize_config(sub_link)
-        normalized_config = OrderService.normalize_config(config_text)
+    async def approve_order(order_id: int, sub_link: str) -> Order | None:
+        normalized_sub_link = OrderService.normalize_sub_link(sub_link)
         async with async_session_factory() as session:
             result = await session.execute(
                 update(Order)
@@ -176,7 +175,6 @@ class OrderService:
                 .values(
                     status=OrderService.approved,
                     sub_link=normalized_sub_link,
-                    config_text=normalized_config,
                     approved_at=datetime.now(timezone.utc),
                 )
             )
@@ -199,11 +197,11 @@ class OrderService:
             return await OrderService.get_order(order_id)
 
     @staticmethod
-    def normalize_config(config_text: str) -> str:
-        normalized_config = config_text.strip()
-        if not normalized_config:
-            raise ValueError("لینک کانفیگ را ارسال کنید.")
-        return normalized_config
+    def normalize_sub_link(sub_link: str) -> str:
+        normalized_sub_link = sub_link.strip()
+        if not normalized_sub_link:
+            raise ValueError("لینک اشتراک را ارسال کنید.")
+        return normalized_sub_link
 
     @staticmethod
     def status_label(status: str) -> str:
@@ -260,9 +258,7 @@ class OrderService:
         if order.status == OrderService.approved:
             text += (
                 "\n\nلینک اشتراک:\n"
-                f"{order.sub_link or 'ندارد'}\n\n"
-                "کانفیگ:\n"
-                f"{order.config_text or 'ندارد'}"
+                f"{order.sub_link or 'ندارد'}"
             )
         return text
 
@@ -289,8 +285,6 @@ class OrderService:
                 text
                 + "✅ سفارش تایید شده است.\n\n"
                 + "🔗 لینک اشتراک:\n"
-                f"{order.sub_link or 'ندارد'}\n\n"
-                + "📄 کانفیگ:\n"
-                f"{order.config_text or 'ندارد'}"
+                f"{order.sub_link or 'ندارد'}"
             )
         return text

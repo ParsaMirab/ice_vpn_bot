@@ -168,11 +168,11 @@ async def approve_order_start(callback: CallbackQuery, state: FSMContext) -> Non
     await state.update_data(order_id=order_id)
     await callback.answer()
     if callback.message:
-        await callback.message.answer("لینک اشتراک را ارسال کنید (در صورت نداشتن، «ندارد» را ارسال کنید)")
+        await callback.message.answer("لینک ساب را ارسال کنید")
 
 
 @router.message(AdminFilter(), AdminOrderStates.waiting_for_sub_link)
-async def approve_order_sub_link(message: Message, state: FSMContext) -> None:
+async def approve_order_finish(message: Message, state: FSMContext, bot: Bot) -> None:
     data = await state.get_data()
     order_id = data.get("order_id")
     if not isinstance(order_id, int):
@@ -180,31 +180,13 @@ async def approve_order_sub_link(message: Message, state: FSMContext) -> None:
         await message.answer("سفارش معتبر نیست.")
         return
     if not message.text:
-        await message.answer("لینک اشتراک را ارسال کنید.")
-        return
-    await state.update_data(sub_link=message.text.strip())
-    await state.set_state(AdminOrderStates.waiting_for_config)
-    await message.answer("کانفیگ را ارسال کنید (در صورت نداشتن، «ندارد» را ارسال کنید)")
-
-
-@router.message(AdminFilter(), AdminOrderStates.waiting_for_config)
-async def approve_order_finish(message: Message, state: FSMContext, bot: Bot) -> None:
-    data = await state.get_data()
-    order_id = data.get("order_id")
-    sub_link = data.get("sub_link")
-    if not isinstance(order_id, int) or not isinstance(sub_link, str):
-        await state.clear()
-        await message.answer("سفارش معتبر نیست.")
-        return
-    if not message.text:
-        await message.answer("کانفیگ را ارسال کنید.")
+        await message.answer("لینک ساب را ارسال کنید.")
         return
 
     try:
         order = await OrderService.approve_order(
             order_id=order_id,
-            sub_link=sub_link,
-            config_text=message.text.strip(),
+            sub_link=message.text,
         )
     except ValueError as exc:
         await message.answer(str(exc))
@@ -219,7 +201,6 @@ async def approve_order_finish(message: Message, state: FSMContext, bot: Bot) ->
 
         caption = "🎉 سفارش شما با موفقیت تایید شد.\n\n"
         caption += f"📡 لینک ساب:\n<code>{order.sub_link or 'ندارد'}</code>\n\n"
-        caption += f"📋 کانفیگ:\n<code>{order.config_text or 'ندارد'}</code>\n\n"
         caption += "💾 از بخش «سفارش‌های من» می‌توانید در هر زمان مجدداً اطلاعات سرویس خود را مشاهده کنید."
 
         await bot.send_photo(
@@ -228,7 +209,7 @@ async def approve_order_finish(message: Message, state: FSMContext, bot: Bot) ->
             caption=caption,
         )
 
-        await message.answer("سفارش تایید شد و اطلاعات برای خریدار ارسال شد.")
+        await message.answer("سفارش تایید شد و لینک ساب برای خریدار ارسال شد.")
 
     except TelegramAPIError as e:
         await message.answer(f"خطا در ارسال پیام به خریدار: {e}")
